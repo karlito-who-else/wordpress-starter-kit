@@ -1,0 +1,21 @@
+# Global parameter defaults
+path: /var/www/html
+url: http://127.0.0.1
+user: admin
+color: true
+
+# Subcommand defaults (e.g. `wp core config`)
+core config:
+  dbuser: root
+  dbpass: blogtest
+  dbhost: mariadb:3306
+  dbname: blogtest
+  # extra-php: |
+  #   define( 'WP_DEBUG', true );
+  #   define( 'WP_POST_REVISIONS', 50 );
+core install:
+   url: 127.0.0.1
+   title: Blog Test
+   admin_user: admin
+   admin_email: admin@primeordinal.com
+   prompt: admin_password < admin_password.txt

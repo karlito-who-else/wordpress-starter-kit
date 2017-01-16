@@ -1,0 +1,82 @@
+version: '2'
+
+services:
+  mariadb:
+    container_name: mariadb
+    image: mariadb
+    env_file:
+      - config.env
+    expose:
+      - 3306
+    networks:
+      - db
+    ports:
+      - 3306:3306
+    restart: always
+    volumes:
+      - ./mariadb:/var/lib/mysql
+  wordpress:
+    container_name: wordpress
+    depends_on:
+      - mariadb
+    image: wordpress
+    ports:
+      - 8080:80
+    env_file:
+      - config.env
+    # environment:
+    #   WORDPRESS_DB_HOST: mariadb:3306
+    #   WORDPRESS_DB_PASSWORD: wordpress
+
+    networks:
+      - db
+      - proxy
+    restart: always
+    volumes:
+      - ./php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./html:/var/www/html
+      - ./mariadb:/var/lib/mysql
+  wp-cli:
+    build:
+      # args:
+      #   - AUTHOR_NAME=Karl Podger
+      #   - AUTHOR_URI=https://www.primeordinal.com/
+      #   - SYSTEM_USER=wordpress
+      #   - THEME_NAME=Super Awesome
+      #   - THEME_SLUG=superawesome
+      context: .
+      dockerfile: docker/wp-cli/Dockerfile
+    container_name: wp-cli
+    depends_on:
+      - wordpress
+    env_file:
+      - config.env
+    networks:
+      - db
+      - proxy
+    restart: on-failure
+    volumes:
+      - ./php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./html:/var/www/html
+      - ./mariadb:/var/lib/mysql
+
+networks:
+  db:
+  proxy:
+
+volumes:
+  html:
+    driver_opts:
+      type: none
+      device: /html
+      o: bind
+  log:
+    driver_opts:
+      type: none
+      device: /var/log
+      o: bind
+  mariadb:
+    driver_opts:
+      type: none
+      device: /db
+      o: bind
